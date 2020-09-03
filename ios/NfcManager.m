@@ -1135,6 +1135,38 @@ RCT_EXPORT_METHOD(iso15693_extendedWriteSingleBlock:(NSDictionary *)options call
     }
 }
 
+RCT_EXPORT_METHOD(iso15693_sendRequest:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
+{
+    if (@available(iOS 14.0, *)) {
+        if (!sessionEx || !sessionEx.connectedTag) {
+            callback(@[@"Not connected", [NSNull null]]);
+            return;
+        }
+        
+        id<NFCISO15693Tag> tag = [sessionEx.connectedTag asNFCISO15693Tag];
+        if (!tag) {
+            callback(@[@"incorrect tag type", [NSNull null]]);
+            return;
+        }
+        RequestFlag flags = [[options objectForKey:@"flags"] unsignedIntValue];
+        uint8_t commandCode = [[options objectForKey:@"commandCode"] unsignedIntValue];
+        NSData *dataBlock = [self arrayToData:[options mutableArrayValueForKey:@"dataBlock"]];
+        
+        [tag sendRequestWithFlag:flags commandCode:commandCode data:dataBlock
+               completionHandler:^(NFCISO15693ResponseFlag flag, NSData *data, NSError *error) {
+            if (error) {
+                callback(@[[error localizedDescription], [NSNull null]]);
+                return;
+            }
+            
+            callback(@[]);
+        }];
+    } else {
+        callback(@[@"Not support in this device", [NSNull null]]);
+    }
+}
+
+
 RCT_EXPORT_METHOD(iso15693_extendedLockBlock:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
 {
     if (@available(iOS 13.0, *)) {

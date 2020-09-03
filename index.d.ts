@@ -104,6 +104,7 @@ declare module 'react-native-nfc-manager' {
     extendedReadSingleBlock: (params: {flags: number, blockNumber: number}) => Promise<number[]>;
     extendedWriteSingleBlock: (params: {flags: number, blockNumber: number, dataBlock: number[]}) => Promise<void>; 
     extendedLockBlock: (params: {flags: number, blockNumber: number}) => Promise<void>; 
+    sendRequest: (params: {flags: number, commandCode: number}) => Promise<void>; 
   }
 
   interface NfcManager {
